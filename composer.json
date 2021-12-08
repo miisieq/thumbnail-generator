@@ -1,0 +1,13 @@
+{
+    "name": "miisieq/thumbnail-generator",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michał Szczech",
+            "email": "m.szczech@hotmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
