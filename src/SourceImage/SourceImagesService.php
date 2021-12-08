@@ -10,8 +10,8 @@ class SourceImagesService
         private SourceImagesRepository $sourceImageRepository
     ) {}
 
-    public function findAll(): ImagePropertiesDTOCollection
+    public function findAll(string $sourceDirectory): ImagePropertiesDTOCollection
     {
-        return $this->sourceImageRepository->findAll();
+        return $this->sourceImageRepository->findAll($sourceDirectory);
     }
 }

@@ -10,19 +10,18 @@ use Symfony\Component\Finder\SplFileInfo;
 class SourceImagesRepository
 {
     public function __construct(
-        private string $searchPath,
         private Finder $finder,
         private ImagePropertiesService $imagePropertiesService,
     ) {}
 
-    public function findAll(): ImagePropertiesDTOCollection
+    public function findAll(string $sourceDirectory): ImagePropertiesDTOCollection
     {
         $collection = new ImagePropertiesDTOCollection();
 
         /** @var SplFileInfo $file */
-        foreach ($this->finder->files()->in($this->searchPath) as $file) {
+        foreach ($this->finder->files()->in($sourceDirectory) as $file) {
             $collection->add($this->imagePropertiesService->extractImagePropertiesFromFile(
-                $this->searchPath . '/' . $file->getRelativePathname()
+                $sourceDirectory . '/' . $file->getRelativePathname()
             ));
         }
 

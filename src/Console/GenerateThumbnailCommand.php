@@ -12,13 +12,21 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 
 class GenerateThumbnailCommand extends Command
 {
     public const COMMAND_NAME = 'generate-thumbnail';
 
+    private InputInterface $input;
+
+    private OutputInterface $output;
+
+    private QuestionHelper $questionHelper;
+
     public function __construct(
-        private SourceImagesService $sourceImageService
+        private SourceImagesService $sourceImageService,
+        private string $defaultSourceDirectory
     ) {
         parent::__construct();
     }
@@ -30,19 +38,31 @@ class GenerateThumbnailCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output):int
     {
-        $selectedImagePropertiesDTO = $this->askAboutSourceImage($input, $output, $this->getHelper('question'));
+        $this->input = $input;
+        $this->output = $output;
+        $this->questionHelper = $this->getHelper('question');
+
+        $selectedImagePropertiesDTO = $this->askAboutSourceImage(
+            $this->askAboutSourceDirectory()
+        );
         var_dump($selectedImagePropertiesDTO);
 
         return self::SUCCESS;
     }
 
-    private function askAboutSourceImage(
-        InputInterface $input,
-        OutputInterface $output,
-        QuestionHelper $questionHelper
-    ): ImagePropertiesDTO
+    private function askAboutSourceDirectory(): string
     {
-        $imagePropertiesDTOCollection = $this->sourceImageService->findAll();
+        $question = new Question(
+            "Please select a source directory (default: {$this->defaultSourceDirectory}):",
+            $this->defaultSourceDirectory
+        );
+
+        return $this->questionHelper->ask($this->input, $this->output, $question);
+    }
+
+    private function askAboutSourceImage(string $sourceDirectory): ImagePropertiesDTO
+    {
+        $imagePropertiesDTOCollection = $this->sourceImageService->findAll($sourceDirectory);
 
         $question = new ChoiceQuestion(
             'Please select an image to generate a thumbnail:',
@@ -52,7 +72,7 @@ class GenerateThumbnailCommand extends Command
         );
 
         /** @var ImagePropertiesDTOConsoleDecorator $decoratedAnswer */
-        $decoratedAnswer = $questionHelper->ask($input, $output, $question);
+        $decoratedAnswer = $this->questionHelper->ask($this->input, $this->output, $question);
 
         return $decoratedAnswer->getImagePropertiesDTO();
     }
