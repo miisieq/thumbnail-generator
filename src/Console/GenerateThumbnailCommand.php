@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\SourceImage\ImagePropertiesDTO;
-use App\SourceImage\ImagePropertiesDTOConsoleDecorator;
+use App\ImageProperties\ImagePropertiesDTO;
+use App\ImageProperties\ImagePropertiesDTOConsoleDecorator;
+use App\ImageProperties\ImagePropertiesDTOConsoleDecoratorFactory;
 use App\SourceImage\SourceImagesService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -26,6 +27,7 @@ class GenerateThumbnailCommand extends Command
 
     public function __construct(
         private SourceImagesService $sourceImageService,
+        private ImagePropertiesDTOConsoleDecoratorFactory $imagePropertiesDTOConsoleDecoratorFactory,
         private string $defaultSourceDirectory
     ) {
         parent::__construct();
@@ -67,7 +69,7 @@ class GenerateThumbnailCommand extends Command
         $question = new ChoiceQuestion(
             'Please select an image to generate a thumbnail:',
             $imagePropertiesDTOCollection->map(function (ImagePropertiesDTO $imagePropertiesDTO) {
-                return new ImagePropertiesDTOConsoleDecorator($imagePropertiesDTO);
+                return $this->imagePropertiesDTOConsoleDecoratorFactory->create($imagePropertiesDTO);
             })->toArray()
         );
 

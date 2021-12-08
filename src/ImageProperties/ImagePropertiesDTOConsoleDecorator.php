@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\SourceImage;
+namespace App\ImageProperties;
+
+use ScriptFUSION\Byte\ByteFormatter;
 
 class ImagePropertiesDTOConsoleDecorator implements \Stringable
 {
-    private const LABEL_PATTERN = '%s resolution: %s x %s px';
+    private const LABEL_PATTERN = '%s   size: %s    resolution: %s x %s px';
 
     public function __construct(
-        private ImagePropertiesDTO $imagePropertiesDTO
+        private ImagePropertiesDTO $imagePropertiesDTO,
+        private ByteFormatter $byteFormatter
     ) {}
 
     public function getImagePropertiesDTO(): ImagePropertiesDTO
@@ -22,6 +25,7 @@ class ImagePropertiesDTOConsoleDecorator implements \Stringable
         return sprintf(
             self::LABEL_PATTERN,
             $this->imagePropertiesDTO->getFilePath(),
+            $this->byteFormatter->format($this->imagePropertiesDTO->getSize(), 2),
             $this->imagePropertiesDTO->getWidth(),
             $this->imagePropertiesDTO->getHeight()
         );

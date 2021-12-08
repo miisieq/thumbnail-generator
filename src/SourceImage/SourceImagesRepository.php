@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\SourceImage;
 
+use App\ImageProperties\ImagePropertiesDTOCollection;
+use App\ImageProperties\ImagePropertiesService;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 

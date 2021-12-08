@@ -1,6 +1,6 @@
 <?php
 
-namespace App\SourceImage;
+namespace App\ImageProperties;
 
 class ImagePropertiesDTO
 {

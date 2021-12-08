@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\SourceImage;
+namespace App\ImageProperties;
 
 use Ramsey\Collection\AbstractCollection;
 
