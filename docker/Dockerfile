@@ -2,6 +2,9 @@ FROM php:8.0-cli
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN \
+    # Set PHP configuration \
+    echo 'memory_limit = 256M' >> /usr/local/etc/php/conf.d/app.ini && \
+    \
     # Update sources
     apt-get update -y && \
     apt-get upgrade -y && \
@@ -12,7 +15,8 @@ RUN \
     docker-php-ext-enable zip && \
     \
     # Install PHP "gd" extension with dependencies
-    apt-get install -y libpng-dev && \
+    apt-get install -y libpng-dev libjpeg-dev && \
+    docker-php-ext-configure gd --enable-gd --with-jpeg && \
     docker-php-ext-install gd && \
     \
     # Install PHP "xdebug" extension

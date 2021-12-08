@@ -7,6 +7,7 @@ namespace App\Console;
 use App\ImageProperties\ImagePropertiesDTO;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecorator;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecoratorFactory;
+use App\ImageResizer\ImageResizerService;
 use App\SourceImage\SourceImagesService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -26,9 +27,10 @@ class GenerateThumbnailCommand extends Command
     private QuestionHelper $questionHelper;
 
     public function __construct(
-        private SourceImagesService $sourceImageService,
         private ImagePropertiesDTOConsoleDecoratorFactory $imagePropertiesDTOConsoleDecoratorFactory,
-        private string $defaultSourceDirectory
+        private ImageResizerService $imageResizerService,
+        private SourceImagesService $sourceImageService,
+        private string $defaultSourceDirectory,
     ) {
         parent::__construct();
     }
@@ -47,7 +49,9 @@ class GenerateThumbnailCommand extends Command
         $selectedImagePropertiesDTO = $this->askAboutSourceImage(
             $this->askAboutSourceDirectory()
         );
-        var_dump($selectedImagePropertiesDTO);
+        $temporaryFilePath = $this->imageResizerService->generateThumbnail($selectedImagePropertiesDTO->getFilePath(), 150);
+        $output->writeln("Thumbnail temporarily saved in \"$temporaryFilePath\".");
+
 
         return self::SUCCESS;
     }
