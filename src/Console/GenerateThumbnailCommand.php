@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Common\FileNameGenerator;
 use App\ImageProperties\ImagePropertiesDTO;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecorator;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecoratorFactory;
@@ -30,6 +31,7 @@ class GenerateThumbnailCommand extends Command
         private ImagePropertiesDTOConsoleDecoratorFactory $imagePropertiesDTOConsoleDecoratorFactory,
         private ImageResizerService $imageResizerService,
         private SourceImagesService $sourceImageService,
+        private FileNameGenerator $fileNameGenerator,
         private string $defaultSourceDirectory,
     ) {
         parent::__construct();
@@ -52,6 +54,11 @@ class GenerateThumbnailCommand extends Command
         $temporaryFilePath = $this->imageResizerService->generateThumbnail($selectedImagePropertiesDTO->getFilePath(), 150);
         $output->writeln("Thumbnail temporarily saved in \"$temporaryFilePath\".");
 
+        $targetFileName = $this->fileNameGenerator->generateFileNameWithExtensionFromMimeType(
+            $selectedImagePropertiesDTO->getMimeType()
+        );
+
+        var_dump($targetFileName);
 
         return self::SUCCESS;
     }

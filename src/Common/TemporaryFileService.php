@@ -4,7 +4,7 @@ namespace App\Common;
 
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
-class FileSystemUtils
+class TemporaryFileService
 {
     private array $temporaryFiles = [];
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\ImageResizer;
 
-use App\Common\FileSystemUtils;
+use App\Common\TemporaryFileService;
 use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
 
@@ -12,7 +12,7 @@ class ImageResizerService
 {
     public function __construct(
         private ImagineInterface $imagine,
-        private FileSystemUtils $fileSystemUtils
+        private TemporaryFileService $fileSystemUtils
     ) {}
 
     public function generateThumbnail(string $filePath, int $width): string
