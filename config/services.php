@@ -10,6 +10,7 @@ use App\ImageProperties\ImagePropertiesService;
 use App\ImageResizer\ImageResizerService;
 use App\SourceImage\SourceImagesRepository;
 use App\SourceImage\SourceImagesService;
+use App\ThumbnailStorage\ThumbnailStorageDropboxStrategy;
 use App\ThumbnailStorage\ThumbnailStorageLocalFilesystemStrategy;
 use App\ThumbnailStorage\ThumbnailStorageS3Strategy;
 use App\ThumbnailStorage\ThumbnailStorageService;
@@ -17,6 +18,7 @@ use Aws\S3\S3Client;
 use Imagine\Gd\Imagine;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use Spatie\Dropbox\Client as DropboxClient;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -36,6 +38,7 @@ return function (ContainerConfigurator $configurator)
     $configurator->parameters()->set('app.s3_endpoint', $_ENV['S3_ENDPOINT']);
     $configurator->parameters()->set('app.s3_key', $_ENV['S3_KEY']);
     $configurator->parameters()->set('app.s3_secret', $_ENV['S3_SECRET']);
+    $configurator->parameters()->set('app.dropbox_token', $_ENV['DROPBOX_TOKEN']);
 
     $services->set(S3Client::class, S3Client::class)
         ->args([
@@ -93,6 +96,11 @@ return function (ContainerConfigurator $configurator)
             service(SourceImagesRepository::class)
         ]);
 
+    $services->set(DropboxClient::class, DropboxClient::class)
+        ->args([
+            param('app.dropbox_token')
+        ]);
+
     $services->set(ThumbnailStorageLocalFilesystemStrategy::class, ThumbnailStorageLocalFilesystemStrategy::class)
         ->args([
             service(Filesystem::class),
@@ -104,10 +112,17 @@ return function (ContainerConfigurator $configurator)
             service(S3Client::class),
             param('app.s3_bucket')
         ]);
+    
+    $services->set(ThumbnailStorageDropboxStrategy::class, ThumbnailStorageDropboxStrategy::class)
+        ->args([
+            service(DropboxClient::class)
+        ]);
 
     $services->set(ThumbnailStorageService::class, ThumbnailStorageService::class)
         ->call('addStrategy', [service(ThumbnailStorageLocalFilesystemStrategy::class)])
-        ->call('addStrategy', [service(ThumbnailStorageS3Strategy::class)]);
+        ->call('addStrategy', [service(ThumbnailStorageS3Strategy::class)])
+        ->call('addStrategy', [service(ThumbnailStorageDropboxStrategy::class)])
+    ;
 
     $services->set(GenerateThumbnailCommand::class, GenerateThumbnailCommand::class)
         ->args([

@@ -16,6 +16,7 @@
         "ramsey/collection": "^1.2",
         "ramsey/uuid": "^4.2",
         "scriptfusion/byte-formatter": "^4.0",
+        "spatie/dropbox-api": "^1.19",
         "symfony/config": "^6.0",
         "symfony/console": "^6.0",
         "symfony/dependency-injection": "^6.0",
