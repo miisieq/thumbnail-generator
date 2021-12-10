@@ -13,7 +13,8 @@ class ImagePropertiesDTOConsoleDecorator implements \Stringable
     public function __construct(
         private ImagePropertiesDTO $imagePropertiesDTO,
         private ByteFormatter $byteFormatter
-    ) {}
+    ) {
+    }
 
     public function getImagePropertiesDTO(): ImagePropertiesDTO
     {

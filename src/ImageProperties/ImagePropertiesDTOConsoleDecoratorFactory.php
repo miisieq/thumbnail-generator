@@ -10,7 +10,8 @@ class ImagePropertiesDTOConsoleDecoratorFactory
 {
     public function __construct(
         private ByteFormatter $bytesFormatter
-    ) {}
+    ) {
+    }
 
     public function create(ImagePropertiesDTO $imagePropertiesDTO): ImagePropertiesDTOConsoleDecorator
     {

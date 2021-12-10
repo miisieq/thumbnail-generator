@@ -10,7 +10,8 @@ class ThumbnailStorageDropboxStrategy implements ThumbnailStorageStrategyInterfa
 {
     public function __construct(
         private Client $client
-    ) {}
+    ) {
+    }
 
     public function persist(string $sourceFilePath, string $targetFilePath)
     {

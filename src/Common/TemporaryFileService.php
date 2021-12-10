@@ -10,7 +10,8 @@ class TemporaryFileService
 
     public function __construct(
         private SymfonyFilesystem $filesystem
-    ) {}
+    ) {
+    }
 
     public function __destruct()
     {

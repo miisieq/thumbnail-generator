@@ -10,7 +10,8 @@ class SourceImagesService
 {
     public function __construct(
         private SourceImagesRepository $sourceImageRepository
-    ) {}
+    ) {
+    }
 
     public function findAll(string $sourceDirectory): ImagePropertiesDTOCollection
     {

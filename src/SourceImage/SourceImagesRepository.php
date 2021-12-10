@@ -14,7 +14,8 @@ class SourceImagesRepository
     public function __construct(
         private Finder $finder,
         private ImagePropertiesService $imagePropertiesService,
-    ) {}
+    ) {
+    }
 
     public function findAll(string $sourceDirectory): ImagePropertiesDTOCollection
     {

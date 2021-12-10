@@ -46,7 +46,7 @@ class GenerateThumbnailCommand extends Command
         $this->setName(self::COMMAND_NAME);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output):int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;

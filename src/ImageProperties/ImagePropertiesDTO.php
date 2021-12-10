@@ -11,7 +11,8 @@ class ImagePropertiesDTO
         private int $size,
         private int $width,
         private int $height,
-    ) {}
+    ) {
+    }
 
     public function getFileName(): string
     {

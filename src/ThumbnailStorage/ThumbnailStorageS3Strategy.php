@@ -11,7 +11,8 @@ class ThumbnailStorageS3Strategy implements ThumbnailStorageStrategyInterface
     public function __construct(
         private S3Client $s3Client,
         private string $bucketName
-    ) {}
+    ) {
+    }
 
     public function persist(string $sourceFilePath, string $targetFilePath)
     {

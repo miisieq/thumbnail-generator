@@ -11,7 +11,8 @@ class ThumbnailStorageLocalFilesystemStrategy implements ThumbnailStorageStrateg
     public function __construct(
         private Filesystem $filesystem,
         private string $localFileSystemTargetPath,
-    ) {}
+    ) {
+    }
 
     public function persist(string $sourceFilePath, string $targetFilePath)
     {

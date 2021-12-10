@@ -13,7 +13,8 @@ class ImageResizerService
     public function __construct(
         private ImagineInterface $imagine,
         private TemporaryFileService $fileSystemUtils
-    ) {}
+    ) {
+    }
 
     public function generateThumbnail(string $filePath, int $width): string
     {

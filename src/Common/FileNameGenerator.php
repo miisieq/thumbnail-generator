@@ -12,7 +12,8 @@ class FileNameGenerator
     public function __construct(
         private UuidFactoryInterface $uuidFactory,
         private MimeTypes $mimeTypes,
-    ) {}
+    ) {
+    }
 
     public function generateFileNameWithExtensionFromMimeType(string $mimeType): string
     {
