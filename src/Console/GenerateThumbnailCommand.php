@@ -65,6 +65,8 @@ class GenerateThumbnailCommand extends Command
         /** @var ThumbnailStorageStrategyInterface $strategy */
         foreach ($this->askAboutPersistenceStrategy() as $strategy) {
             $strategy->persist($temporaryFilePath, $targetFileName);
+
+            $output->writeln("Successfully saved to <info>$strategy</info>!");
         }
 
         return self::SUCCESS;
