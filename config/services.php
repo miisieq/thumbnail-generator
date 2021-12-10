@@ -10,6 +10,10 @@ use App\ImageProperties\ImagePropertiesService;
 use App\ImageResizer\ImageResizerService;
 use App\SourceImage\SourceImagesRepository;
 use App\SourceImage\SourceImagesService;
+use App\ThumbnailStorage\ThumbnailStorageLocalFilesystemStrategy;
+use App\ThumbnailStorage\ThumbnailStorageS3Strategy;
+use App\ThumbnailStorage\ThumbnailStorageService;
+use Aws\S3\S3Client;
 use Imagine\Gd\Imagine;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
@@ -24,6 +28,27 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 return function (ContainerConfigurator $configurator)
 {
     $services = $configurator->services()->defaults();
+
+    $configurator->parameters()->set('app.defaultSourceDirectory', $_ENV['DEFAULT_SOURCE_DIRECTORY']);
+    $configurator->parameters()->set('app.localFileSystemTargetPath', $_ENV['LOCAL_FILE_SYSTEM_TARGET_PATH']);
+    $configurator->parameters()->set('app.s3_bucket', $_ENV['S3_BUCKET']);
+    $configurator->parameters()->set('app.s3_region', $_ENV['S3_REGION']);
+    $configurator->parameters()->set('app.s3_endpoint', $_ENV['S3_ENDPOINT']);
+    $configurator->parameters()->set('app.s3_key', $_ENV['S3_KEY']);
+    $configurator->parameters()->set('app.s3_secret', $_ENV['S3_SECRET']);
+
+    $services->set(S3Client::class, S3Client::class)
+        ->args([
+            [
+                'version' => 'latest',
+                'region'  => param('app.s3_region'),
+                'endpoint' => param('app.s3_endpoint'),
+                'credentials' => [
+                    'key' => param('app.s3_key'),
+                    'secret' => param('app.s3_secret'),
+                ],
+            ]
+        ]);
 
     $services->set(ByteFormatter::class, ByteFormatter::class);
     $services->set(Filesystem::class, Filesystem::class);
@@ -45,8 +70,6 @@ return function (ContainerConfigurator $configurator)
         ->args([
             service(Filesystem::class),
         ]);
-
-    $configurator->parameters()->set('app.defaultSourceDirectory', $_ENV['DEFAULT_SOURCE_DIRECTORY']);
 
     $services->set(ImageResizerService::class, ImageResizerService::class)
         ->args([
@@ -70,12 +93,29 @@ return function (ContainerConfigurator $configurator)
             service(SourceImagesRepository::class)
         ]);
 
+    $services->set(ThumbnailStorageLocalFilesystemStrategy::class, ThumbnailStorageLocalFilesystemStrategy::class)
+        ->args([
+            service(Filesystem::class),
+            param('app.localFileSystemTargetPath')
+        ]);
+    
+    $services->set(ThumbnailStorageS3Strategy::class, ThumbnailStorageS3Strategy::class)
+        ->args([
+            service(S3Client::class),
+            param('app.s3_bucket')
+        ]);
+
+    $services->set(ThumbnailStorageService::class, ThumbnailStorageService::class)
+        ->call('addStrategy', [service(ThumbnailStorageLocalFilesystemStrategy::class)])
+        ->call('addStrategy', [service(ThumbnailStorageS3Strategy::class)]);
+
     $services->set(GenerateThumbnailCommand::class, GenerateThumbnailCommand::class)
         ->args([
+            service(FileNameGenerator::class),
             service(ImagePropertiesDTOConsoleDecoratorFactory::class),
             service(ImageResizerService::class),
             service(SourceImagesService::class),
-            service(FileNameGenerator::class),
+            service(ThumbnailStorageService::class),
             param('app.defaultSourceDirectory'),
         ]);
 };

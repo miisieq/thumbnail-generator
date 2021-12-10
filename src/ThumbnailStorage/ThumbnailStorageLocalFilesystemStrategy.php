@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace App\ThumbnailStorage;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 class ThumbnailStorageLocalFilesystemStrategy implements ThumbnailStorageStrategyInterface
 {
-
-    public function __construct()
-    {
-    }
+    public function __construct(
+        private Filesystem $filesystem,
+        private string $localFileSystemTargetPath,
+    ) {}
 
     public function persist(string $sourceFilePath, string $targetFilePath)
     {
-        // TODO: Implement persist() method.
+        $this->filesystem->copy(
+            $sourceFilePath,
+            $this->localFileSystemTargetPath . '/' . $targetFilePath
+        );
     }
 
-    public static function getStrategyIdentifier(): string
+    public function __toString(): string
     {
-        return 'local';
+        return 'Local file system';
     }
 }

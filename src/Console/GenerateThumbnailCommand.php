@@ -10,6 +10,9 @@ use App\ImageProperties\ImagePropertiesDTOConsoleDecorator;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecoratorFactory;
 use App\ImageResizer\ImageResizerService;
 use App\SourceImage\SourceImagesService;
+use App\ThumbnailStorage\ThumbnailStorageService;
+use App\ThumbnailStorage\ThumbnailStorageStrategyCollection;
+use App\ThumbnailStorage\ThumbnailStorageStrategyInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,10 +31,11 @@ class GenerateThumbnailCommand extends Command
     private QuestionHelper $questionHelper;
 
     public function __construct(
+        private FileNameGenerator $fileNameGenerator,
         private ImagePropertiesDTOConsoleDecoratorFactory $imagePropertiesDTOConsoleDecoratorFactory,
         private ImageResizerService $imageResizerService,
         private SourceImagesService $sourceImageService,
-        private FileNameGenerator $fileNameGenerator,
+        private ThumbnailStorageService $thumbnailStorageService,
         private string $defaultSourceDirectory,
     ) {
         parent::__construct();
@@ -58,7 +62,10 @@ class GenerateThumbnailCommand extends Command
             $selectedImagePropertiesDTO->getMimeType()
         );
 
-        var_dump($targetFileName);
+        /** @var ThumbnailStorageStrategyInterface $strategy */
+        foreach ($this->askAboutPersistenceStrategy() as $strategy) {
+            $strategy->persist($temporaryFilePath, $targetFileName);
+        }
 
         return self::SUCCESS;
     }
@@ -88,5 +95,18 @@ class GenerateThumbnailCommand extends Command
         $decoratedAnswer = $this->questionHelper->ask($this->input, $this->output, $question);
 
         return $decoratedAnswer->getImagePropertiesDTO();
+    }
+
+    private function askAboutPersistenceStrategy(): ThumbnailStorageStrategyCollection
+    {
+        $question = new ChoiceQuestion(
+            'Please select target storage:',
+            $this->thumbnailStorageService->getStrategies()->toArray()
+        );
+        $question->setMultiselect(true);
+
+        return new ThumbnailStorageStrategyCollection(
+            $this->questionHelper->ask($this->input, $this->output, $question)
+        );
     }
 }

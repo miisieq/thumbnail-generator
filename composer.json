@@ -11,6 +11,7 @@
     "minimum-stability": "stable",
     "require": {
         "ext-gd": "*",
+        "aws/aws-sdk-php": "^3.208",
         "imagine/imagine": "^1.2",
         "ramsey/collection": "^1.2",
         "ramsey/uuid": "^4.2",

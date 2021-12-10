@@ -8,5 +8,5 @@ interface ThumbnailStorageStrategyInterface
 {
     public function persist(string $sourceFilePath, string $targetFilePath);
 
-    public static function getStrategyIdentifier(): string;
+    public function __toString(): string;
 }
