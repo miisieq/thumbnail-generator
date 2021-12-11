@@ -20,8 +20,7 @@ class FileNameGenerator
         $possibleExtensions = $this->mimeTypes->getExtensions($mimeType);
 
         if (empty($possibleExtensions)) {
-            // TODO: Add domain exception
-            throw new \Exception();
+           throw new NotSupportedMimeTypeException($mimeType);
         }
 
         return $this->uuidFactory->uuid4()->toString() . '.' . $possibleExtensions[0];
