@@ -15,7 +15,7 @@ class FileNameGenerator
     ) {
     }
 
-    public function generateFileNameWithExtensionFromMimeType(string $mimeType): string
+    public function generateRandomFileNameWithExtensionFromMimeType(string $mimeType): string
     {
         $possibleExtensions = $this->mimeTypes->getExtensions($mimeType);
 

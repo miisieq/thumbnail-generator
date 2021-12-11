@@ -25,7 +25,7 @@ class GenerateThumbnailCommand extends Command
 {
     public const COMMAND_NAME = 'generate-thumbnail';
 
-    private const MAX_DIMENSION = 150;
+    private const DEFAULT_MAX_DIMENSION = 150;
 
     private InputInterface $input;
 
@@ -61,7 +61,7 @@ class GenerateThumbnailCommand extends Command
 
         $scaledImageDimensions = $this->imageResizerService->calculateSizeScaledToMaxDimension(
             new ImageDimensionsDTO($selectedImagePropertiesDTO->getWidth(), $selectedImagePropertiesDTO->getHeight()),
-            self::MAX_DIMENSION
+            $this->askAboutMaxDimension()
         );
 
         $temporaryFilePath = $this->imageResizerService->generateThumbnail(
@@ -69,7 +69,7 @@ class GenerateThumbnailCommand extends Command
             $scaledImageDimensions
         );
 
-        $targetFileName = $this->fileNameGenerator->generateFileNameWithExtensionFromMimeType(
+        $targetFileName = $this->fileNameGenerator->generateRandomFileNameWithExtensionFromMimeType(
             $selectedImagePropertiesDTO->getMimeType()
         );
 
@@ -77,7 +77,7 @@ class GenerateThumbnailCommand extends Command
         foreach ($this->askAboutPersistenceStrategy() as $strategy) {
             $strategy->persist($temporaryFilePath, $targetFileName);
 
-            $output->writeln("Successfully saved to <info>$strategy</info>!");
+            $output->writeln("Successfully saved to <info>$strategy</info> as <info>$targetFileName</info>!");
         }
 
         return self::SUCCESS;
@@ -86,7 +86,7 @@ class GenerateThumbnailCommand extends Command
     private function askAboutSourceDirectory(): string
     {
         $question = new Question(
-            "Please select a source directory (default: {$this->defaultSourceDirectory}):",
+            "Please select a source directory <fg=gray>(default: {$this->defaultSourceDirectory})</>: ",
             $this->defaultSourceDirectory
         );
 
@@ -108,6 +108,24 @@ class GenerateThumbnailCommand extends Command
         $decoratedAnswer = $this->questionHelper->ask($this->input, $this->output, $question);
 
         return $decoratedAnswer->getImagePropertiesDTO();
+    }
+
+    public function askAboutMaxDimension(): int
+    {
+        $question = new Question(
+            'Please select a max dimension of the thumbnail <fg=gray>(default: ' . self::DEFAULT_MAX_DIMENSION . ')</>: ',
+            self::DEFAULT_MAX_DIMENSION
+        );
+
+        $question->setValidator(function ($answer) {
+            if (!filter_var($answer, FILTER_VALIDATE_INT)) {
+                throw new \InvalidArgumentException('Maximum dimension must be an integer!');
+            }
+
+            return (int)$answer;
+        });
+
+        return $this->questionHelper->ask($this->input, $this->output, $question);
     }
 
     private function askAboutPersistenceStrategy(): ThumbnailStorageStrategyCollection
