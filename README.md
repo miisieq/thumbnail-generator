@@ -7,7 +7,7 @@ You can use following save adapters:
 * S3 Bucket
 * Dropbox
 
-![Example usage](./example.gif)
+![Example usage](./example.gif | width=900)
 
 ## Installation
 **Caution!** This flow is not optimized for a production usage. For development purposes only.
