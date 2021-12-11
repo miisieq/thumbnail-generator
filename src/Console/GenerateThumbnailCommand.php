@@ -8,6 +8,7 @@ use App\Common\FileNameGenerator;
 use App\ImageProperties\ImagePropertiesDTO;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecorator;
 use App\ImageProperties\ImagePropertiesDTOConsoleDecoratorFactory;
+use App\ImageResizer\ImageDimensionsDTO;
 use App\ImageResizer\ImageResizerService;
 use App\SourceImage\SourceImagesService;
 use App\ThumbnailStorage\ThumbnailStorageService;
@@ -23,6 +24,8 @@ use Symfony\Component\Console\Question\Question;
 class GenerateThumbnailCommand extends Command
 {
     public const COMMAND_NAME = 'generate-thumbnail';
+
+    private const MAX_DIMENSION = 150;
 
     private InputInterface $input;
 
@@ -55,7 +58,16 @@ class GenerateThumbnailCommand extends Command
         $selectedImagePropertiesDTO = $this->askAboutSourceImage(
             $this->askAboutSourceDirectory()
         );
-        $temporaryFilePath = $this->imageResizerService->generateThumbnail($selectedImagePropertiesDTO->getFilePath(), 150);
+
+        $scaledImageDimensions = $this->imageResizerService->calculateSizeScaledToMaxDimension(
+            new ImageDimensionsDTO($selectedImagePropertiesDTO->getWidth(), $selectedImagePropertiesDTO->getHeight()),
+            self::MAX_DIMENSION
+        );
+
+        $temporaryFilePath = $this->imageResizerService->generateThumbnail(
+            $selectedImagePropertiesDTO->getFilePath(),
+            $scaledImageDimensions
+        );
         $output->writeln("Thumbnail temporarily saved in \"$temporaryFilePath\".");
 
         $targetFileName = $this->fileNameGenerator->generateFileNameWithExtensionFromMimeType(
