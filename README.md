@@ -2,7 +2,7 @@
 
 This project uses [GD extension](https://www.php.net/manual/en/book.image.php) to generate a thumbnail from a source image with a maximum dimension specified by user.
 
-You can use following save adapters:
+Following save methods are supported:
 * Local file system
 * S3 Bucket
 * Dropbox
