@@ -68,7 +68,6 @@ class GenerateThumbnailCommand extends Command
             $selectedImagePropertiesDTO->getFilePath(),
             $scaledImageDimensions
         );
-        $output->writeln("Thumbnail temporarily saved in \"$temporaryFilePath\".");
 
         $targetFileName = $this->fileNameGenerator->generateFileNameWithExtensionFromMimeType(
             $selectedImagePropertiesDTO->getMimeType()
